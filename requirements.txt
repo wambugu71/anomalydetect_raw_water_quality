@@ -1,0 +1,9 @@
+paho-mqtt
+dash
+plotly
+pandas
+numpy
+scikit-learn
+dash-daq
+dash-bootstrap-components
+rrcf

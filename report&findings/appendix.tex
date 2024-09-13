@@ -1,0 +1,866 @@
+
+    
+    \hypertarget{comparative-analysis-in-outlier-detection-in-raw-water-quality-nyewasco-with-random-forest-algorithms-and-local-factor-outlier.}{%
+\section{\texorpdfstring{COMPARATIVE ANALYSIS IN OUTLIER DETECTION IN
+RAW WATER QUALITY \texttt{NYEWASCO} WITH RANDOM FOREST ALGORITHMS AND
+LOCAL FACTOR
+OUTLIER.}{COMPARATIVE ANALYSIS IN OUTLIER DETECTION IN RAW WATER QUALITY NYEWASCO WITH RANDOM FOREST ALGORITHMS AND LOCAL FACTOR OUTLIER.}}\label{comparative-analysis-in-outlier-detection-in-raw-water-quality-nyewasco-with-random-forest-algorithms-and-local-factor-outlier.}}
+
+\hypertarget{objectives}{%
+\subsection{OBJECTIVES}\label{objectives}}
+
+\begin{itemize}
+\tightlist
+\item
+  Comparare RCF, LOF AND IF algorithms.
+\end{itemize}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{2}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k+kn}{import} \PY{n+nn}{pandas} \PY{k}{as} \PY{n+nn}{pd}
+\PY{k+kn}{import} \PY{n+nn}{numpy} \PY{k}{as} \PY{n+nn}{np}
+\PY{k+kn}{import} \PY{n+nn}{matplotlib}\PY{n+nn}{.}\PY{n+nn}{pyplot} \PY{k}{as} \PY{n+nn}{plt}
+\PY{k+kn}{import}  \PY{n+nn}{plotly}\PY{n+nn}{.}\PY{n+nn}{express} \PY{k}{as}  \PY{n+nn}{px}
+\PY{k+kn}{import} \PY{n+nn}{plotly}\PY{n+nn}{.}\PY{n+nn}{graph\PYZus{}objects} \PY{k}{as} \PY{n+nn}{go}
+\PY{k+kn}{from} \PY{n+nn}{plotly}\PY{n+nn}{.}\PY{n+nn}{subplots} \PY{k+kn}{import} \PY{n}{make\PYZus{}subplots}
+\PY{k+kn}{import}  \PY{n+nn}{seaborn}  \PY{k}{as}  \PY{n+nn}{sns}
+\PY{k+kn}{from} \PY{n+nn}{datetime} \PY{k+kn}{import} \PY{n}{datetime}
+\PY{n}{plt}\PY{o}{.}\PY{n}{style}\PY{o}{.}\PY{n}{use}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{seaborn\PYZhy{}v0\PYZus{}8\PYZhy{}bright}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{3}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{df} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{read\PYZus{}csv} \PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Data\PYZus{}Raw\PYZus{}Water.csv}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Dataset shape: }\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{o}{.}\PY{n}{format}\PY{p}{(}\PY{n}{df}\PY{o}{.}\PY{n}{shape}\PY{p}{)}\PY{p}{)}
+\PY{n}{df}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+Dataset shape: (2658, 3)
+    \end{Verbatim}
+
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{3}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+                                  time  turbidity    pH
+0     2020-11-04 11:00:31.822439+00:00  21.063435  7.34
+1     2020-11-04 11:01:22.124333+00:00  20.868153  7.33
+2     2020-11-04 11:01:51.663062+00:00  20.584553  7.32
+3     2020-11-04 11:02:29.373718+00:00  21.185328  7.33
+4     2020-11-04 11:03:45.517010+00:00  21.063435  7.32
+{\ldots}                                {\ldots}        {\ldots}   {\ldots}
+2653  2021-01-04 07:53:20.987423+00:00  10.611506  7.35
+2654  2021-01-04 08:23:37.035804+00:00  17.975997  7.35
+2655  2021-01-04 08:53:53.104009+00:00  17.734662  7.34
+2656  2021-01-04 09:24:09.578901+00:00  15.094176  7.36
+2657  2021-01-04 09:54:25.214766+00:00  14.611506  7.36
+
+[2658 rows x 3 columns]
+\end{Verbatim}
+\end{tcolorbox}
+        
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{4}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{df}\PY{o}{.}\PY{n}{info}\PY{p}{(}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 2658 entries, 0 to 2657
+Data columns (total 3 columns):
+ \#   Column     Non-Null Count  Dtype
+---  ------     --------------  -----
+ 0   time       2658 non-null   object
+ 1   turbidity  2658 non-null   float64
+ 2   pH         2658 non-null   float64
+dtypes: float64(2), object(1)
+memory usage: 62.4+ KB
+    \end{Verbatim}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{5}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{df}\PY{o}{.}\PY{n}{describe}\PY{p}{(}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{5}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+         turbidity           pH
+count  2658.000000  2658.000000
+mean     23.324646     7.352193
+std      27.798332     0.009652
+min       8.856159     7.300000
+25\%      13.975997     7.350000
+50\%      17.734662     7.350000
+75\%      18.438760     7.350000
+max     311.975997     7.410000
+\end{Verbatim}
+\end{tcolorbox}
+        
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{6}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{df}\PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{time}\PY{l+s+s2}{\PYZdq{}}\PY{p}{]}  \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{to\PYZus{}datetime}\PY{p}{(}\PY{n}{df}\PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{time}\PY{l+s+s2}{\PYZdq{}}\PY{p}{]}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{7}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{df}\PY{o}{.}\PY{n}{isna}\PY{p}{(}\PY{p}{)}\PY{o}{.}\PY{n}{sum}\PY{p}{(}\PY{p}{)} \PY{c+c1}{\PYZsh{}checking  for  null values. }
+\end{Verbatim}
+\end{tcolorbox}
+
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{7}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+time         0
+turbidity    0
+pH           0
+dtype: int64
+\end{Verbatim}
+\end{tcolorbox}
+        
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{8}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k+kn}{import} \PY{n+nn}{matplotlib}\PY{n+nn}{.}\PY{n+nn}{pyplot} \PY{k}{as} \PY{n+nn}{plt}
+
+\PY{c+c1}{\PYZsh{} Set the figure size to be larger}
+\PY{n}{plt}\PY{o}{.}\PY{n}{figure}\PY{p}{(}\PY{n}{figsize}\PY{o}{=}\PY{p}{(}\PY{l+m+mi}{14}\PY{p}{,} \PY{l+m+mi}{6}\PY{p}{)}\PY{p}{)}
+
+\PY{c+c1}{\PYZsh{} RAW WATER TURBIDITY TREND}
+\PY{n}{plt}\PY{o}{.}\PY{n}{subplot}\PY{p}{(}\PY{l+m+mi}{1}\PY{p}{,} \PY{l+m+mi}{2}\PY{p}{,} \PY{l+m+mi}{1}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n}{df}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{time}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} \PY{n}{df}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{turbidity}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{legend}\PY{p}{(}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{TURBIDITY}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{xticks}\PY{p}{(}\PY{n}{rotation}\PY{o}{=}\PY{l+m+mi}{45}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{xlabel}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Time (Date)}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{size}\PY{o}{=}\PY{l+m+mi}{14}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{ylabel}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Turbidity (NTU)}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{size}\PY{o}{=}\PY{l+m+mi}{14}\PY{p}{)}
+
+\PY{c+c1}{\PYZsh{} RAW WATER pH TREND}
+\PY{n}{plt}\PY{o}{.}\PY{n}{subplot}\PY{p}{(}\PY{l+m+mi}{1}\PY{p}{,} \PY{l+m+mi}{2}\PY{p}{,} \PY{l+m+mi}{2}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n}{df}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{time}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} \PY{n}{df}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pH}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{legend}\PY{p}{(}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pH Value}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{xticks}\PY{p}{(}\PY{n}{rotation}\PY{o}{=}\PY{l+m+mi}{45}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{xlabel}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Time (Date)}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{size}\PY{o}{=}\PY{l+m+mi}{14}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{ylabel}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Water pH}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{size}\PY{o}{=}\PY{l+m+mi}{14}\PY{p}{)}
+
+\PY{c+c1}{\PYZsh{} Adjust layout to prevent overlap}
+\PY{n}{plt}\PY{o}{.}\PY{n}{tight\PYZus{}layout}\PY{p}{(}\PY{p}{)}
+
+\PY{c+c1}{\PYZsh{} Show the plot}
+\PY{n}{plt}\PY{o}{.}\PY{n}{savefig}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{vaiables\PYZus{}trend.png}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{show}\PY{p}{(}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{center}
+    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{output_7_0.png}
+    \end{center}
+    { \hspace*{\fill} \\}
+    
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{9}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Data ranges  from date }\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s2}{ to }\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{o}{.}\PY{n}{format}\PY{p}{(}\PY{n}{df}\PY{o}{.}\PY{n}{time}\PY{o}{.}\PY{n}{min}\PY{p}{(}\PY{p}{)}\PY{p}{,} \PY{n}{df}\PY{o}{.}\PY{n}{time}\PY{o}{.}\PY{n}{max}\PY{p}{(}\PY{p}{)}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+Data ranges  from date 2020-11-04 11:00:31.822439+00:00 to 2021-01-04
+09:54:25.214766+00:00
+    \end{Verbatim}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{10}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Data samples in the  if\PYZus{}model\PYZus{}dfset: }\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{o}{.}\PY{n}{format}\PY{p}{(}\PY{n+nb}{len}\PY{p}{(}\PY{n}{df}\PY{p}{)}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+Data samples in the  if\_model\_dfset: 2658
+    \end{Verbatim}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{11}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{plt}\PY{o}{.}\PY{n}{subplot}\PY{p}{(}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{2}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{)}
+\PY{n}{sns}\PY{o}{.}\PY{n}{histplot}\PY{p}{(}\PY{n}{df}\PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{turbidity}\PY{l+s+s2}{\PYZdq{}}\PY{p}{]}\PY{p}{,} \PY{n}{bins}\PY{o}{=}\PY{l+m+mi}{20}\PY{p}{,} \PY{n}{kde}\PY{o}{=}\PY{k+kc}{True}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{title}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Turbidity Distribution}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+
+\PY{n}{plt}\PY{o}{.}\PY{n}{subplot}\PY{p}{(}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{2}\PY{p}{,}\PY{l+m+mi}{2}\PY{p}{)}
+\PY{n}{sns}\PY{o}{.}\PY{n}{histplot}\PY{p}{(}\PY{n}{df}\PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{pH}\PY{l+s+s2}{\PYZdq{}}\PY{p}{]}\PY{p}{,} \PY{n}{kde}\PY{o}{=}\PY{k+kc}{True}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{title}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{pH Distribution}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+
+\PY{n}{plt}\PY{o}{.}\PY{n}{tight\PYZus{}layout}\PY{p}{(}\PY{p}{)}
+
+\PY{n}{plt}\PY{o}{.}\PY{n}{savefig}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{variable\PYZus{}distributions.png}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{center}
+    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{output_10_0.png}
+    \end{center}
+    { \hspace*{\fill} \\}
+    
+    \hypertarget{turbidity-distribution}{%
+\subsubsection{Turbidity Distribution:}\label{turbidity-distribution}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Shape}: The turbidity distribution is highly right-skewed
+  (positively skewed). Most of the data points are concentrated at the
+  lower end of the scale.
+\item
+  \textbf{Concentration}: A significant number of observations have very
+  low turbidity values, close to zero.
+\item
+  \textbf{Outliers}: There are a few observations with much higher
+  turbidity values, extending up to around 300, but these are relatively
+  rare.
+\end{itemize}
+
+\hypertarget{ph-distribution}{%
+\subsubsection{pH Distribution:}\label{ph-distribution}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Shape}: The pH distribution is approximately normal but with a
+  very narrow range.
+\item
+  \textbf{Concentration}: The majority of the pH values are tightly
+  clustered around the mean, which appears to be around 7.35.
+\item
+  \textbf{Spread}: The distribution shows a high peak, indicating that
+  most of the pH values are very close to the mean, with very few values
+  deviating significantly from it.
+\end{itemize}
+
+\hypertarget{insights}{%
+\subsubsection{Insights:}\label{insights}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Turbidity}: The data suggests that most samples have low
+  turbidity, indicating clear water in most cases. However, there are
+  occasional instances of high turbidity, which could be due to specific
+  events or conditions causing temporary increases in water turbidity.
+\item
+  \textbf{pH}: The pH values are very consistent and centered around a
+  neutral pH of 7.35. This indicates stable water quality in terms of
+  acidity and alkalinity, with very little variation.
+\end{enumerate}
+
+    \hypertarget{modelling}{%
+\section{Modelling}\label{modelling}}
+
+\hypertarget{using-rrcf-if-lof}{%
+\subsection{using RRCF, IF, LOF}\label{using-rrcf-if-lof}}
+
+    Here we shall be modelling all the variables using the mentioned machine
+learning models for anomaly detection.
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{12}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k+kn}{from} \PY{n+nn}{sklearn}\PY{n+nn}{.}\PY{n+nn}{ensemble} \PY{k+kn}{import} \PY{n}{IsolationForest}
+\PY{n}{clf} \PY{o}{=} \PY{n}{IsolationForest}\PY{p}{(}\PY{p}{)}
+\PY{n}{clf}\PY{o}{.}\PY{n}{get\PYZus{}params}\PY{p}{(}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{12}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\{'bootstrap': False,
+ 'contamination': 'auto',
+ 'max\_features': 1.0,
+ 'max\_samples': 'auto',
+ 'n\_estimators': 100,
+ 'n\_jobs': None,
+ 'random\_state': None,
+ 'verbose': 0,
+ 'warm\_start': False\}
+\end{Verbatim}
+\end{tcolorbox}
+        
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{13}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k+kn}{import} \PY{n+nn}{pandas} \PY{k}{as} \PY{n+nn}{pd}
+\PY{k+kn}{import} \PY{n+nn}{numpy} \PY{k}{as} \PY{n+nn}{np}
+\PY{k+kn}{import} \PY{n+nn}{matplotlib}\PY{n+nn}{.}\PY{n+nn}{pyplot} \PY{k}{as} \PY{n+nn}{plt}
+\PY{k+kn}{from} \PY{n+nn}{sklearn}\PY{n+nn}{.}\PY{n+nn}{ensemble} \PY{k+kn}{import} \PY{n}{IsolationForest}
+\PY{k+kn}{from} \PY{n+nn}{sklearn}\PY{n+nn}{.}\PY{n+nn}{neighbors} \PY{k+kn}{import} \PY{n}{LocalOutlierFactor}
+\PY{k+kn}{from} \PY{n+nn}{sklearn}\PY{n+nn}{.}\PY{n+nn}{model\PYZus{}selection} \PY{k+kn}{import} \PY{n}{GridSearchCV}
+\PY{k+kn}{import} \PY{n+nn}{rrcf}
+\PY{k+kn}{import} \PY{n+nn}{warnings}
+\PY{k+kn}{import} \PY{n+nn}{time}
+\PY{n}{warnings}\PY{o}{.}\PY{n}{filterwarnings}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{ignore}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+
+\PY{c+c1}{\PYZsh{} Step 1: assigning preprocessed data}
+\PY{n}{data} \PY{o}{=} \PY{n}{df}
+
+\PY{c+c1}{\PYZsh{} Step 2: Preprocess the data}
+\PY{c+c1}{\PYZsh{} Extract the turbidity and pH columns}
+\PY{n}{turbidity} \PY{o}{=} \PY{n}{data}\PY{p}{[}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{turbidity}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{]}
+\PY{n}{pH} \PY{o}{=} \PY{n}{data}\PY{p}{[}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pH}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{]}
+
+\PY{c+c1}{\PYZsh{} Function to plot anomalies}
+\PY{k}{def} \PY{n+nf}{plot\PYZus{}anomalies}\PY{p}{(}\PY{n}{data}\PY{p}{,} \PY{n}{anomalies}\PY{p}{,} \PY{n}{scores}\PY{p}{,} \PY{n}{title}\PY{p}{,} \PY{n}{ax}\PY{p}{)}\PY{p}{:}
+    \PY{n}{ax}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n}{data}\PY{p}{,} \PY{n}{label}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Data}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+    \PY{n}{ax}\PY{o}{.}\PY{n}{scatter}\PY{p}{(}\PY{n}{data}\PY{o}{.}\PY{n}{index}\PY{p}{[}\PY{n}{anomalies}\PY{p}{]}\PY{p}{,} \PY{n}{data}\PY{p}{[}\PY{n}{anomalies}\PY{p}{]}\PY{p}{,} \PY{n}{color}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{red}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{marker}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{x}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{label}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Anomaly}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+    \PY{n}{ax}\PY{o}{.}\PY{n}{set\PYZus{}title}\PY{p}{(}\PY{n}{title}\PY{p}{)}
+    \PY{n}{ax}\PY{o}{.}\PY{n}{legend}\PY{p}{(}\PY{n}{loc}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{upper left}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+    \PY{n}{ax2} \PY{o}{=} \PY{n}{ax}\PY{o}{.}\PY{n}{twinx}\PY{p}{(}\PY{p}{)}
+    \PY{n}{ax2}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n}{data}\PY{o}{.}\PY{n}{index}\PY{p}{,} \PY{n}{scores}\PY{p}{,} \PY{n}{color}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{orange}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{alpha}\PY{o}{=}\PY{l+m+mf}{0.5}\PY{p}{)}
+    \PY{n}{ax2}\PY{o}{.}\PY{n}{set\PYZus{}ylabel}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Anomaly Score}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+
+\PY{c+c1}{\PYZsh{} Step 3: Hyperparameter tuning and anomaly detection}
+\PY{c+c1}{\PYZsh{} Timing Isolation Forest}
+\PY{n}{start\PYZus{}time} \PY{o}{=} \PY{n}{time}\PY{o}{.}\PY{n}{time}\PY{p}{(}\PY{p}{)}
+\PY{n}{iso\PYZus{}forest} \PY{o}{=} \PY{n}{IsolationForest}\PY{p}{(}\PY{p}{)}
+\PY{n}{param\PYZus{}grid} \PY{o}{=} \PY{p}{\PYZob{}}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{n\PYZus{}estimators}\PY{l+s+s1}{\PYZsq{}}\PY{p}{:} \PY{p}{[}\PY{l+m+mi}{50}\PY{p}{,} \PY{l+m+mi}{100}\PY{p}{,} \PY{l+m+mi}{200}\PY{p}{]}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{contamination}\PY{l+s+s1}{\PYZsq{}}\PY{p}{:} \PY{p}{[}\PY{l+m+mf}{0.05}\PY{p}{,} \PY{l+m+mf}{0.1}\PY{p}{,} \PY{l+m+mf}{0.15}\PY{p}{]}\PY{p}{\PYZcb{}}
+\PY{n}{grid\PYZus{}search\PYZus{}iso} \PY{o}{=} \PY{n}{GridSearchCV}\PY{p}{(}\PY{n}{iso\PYZus{}forest}\PY{p}{,} \PY{n}{param\PYZus{}grid}\PY{p}{,} \PY{n}{scoring}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{accuracy}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{cv}\PY{o}{=}\PY{l+m+mi}{3}\PY{p}{,} \PY{n}{verbose}\PY{o}{=}\PY{k+kc}{True}\PY{p}{)}
+\PY{n}{grid\PYZus{}search\PYZus{}iso}\PY{o}{.}\PY{n}{fit}\PY{p}{(}\PY{n}{turbidity}\PY{p}{)}
+\PY{n}{iso\PYZus{}time} \PY{o}{=} \PY{n}{time}\PY{o}{.}\PY{n}{time}\PY{p}{(}\PY{p}{)} \PY{o}{\PYZhy{}} \PY{n}{start\PYZus{}time}
+\PY{n}{best\PYZus{}iso\PYZus{}forest} \PY{o}{=} \PY{n}{grid\PYZus{}search\PYZus{}iso}\PY{o}{.}\PY{n}{best\PYZus{}estimator\PYZus{}}
+\PY{n}{start\PYZus{}time} \PY{o}{=} \PY{n}{time}\PY{o}{.}\PY{n}{time}\PY{p}{(}\PY{p}{)}  \PY{c+c1}{\PYZsh{} Start timing after finding the best estimator}
+\PY{n}{iso\PYZus{}anomalies} \PY{o}{=} \PY{n}{best\PYZus{}iso\PYZus{}forest}\PY{o}{.}\PY{n}{predict}\PY{p}{(}\PY{n}{turbidity}\PY{p}{)}
+\PY{n}{iso\PYZus{}anomalies} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{where}\PY{p}{(}\PY{n}{iso\PYZus{}anomalies} \PY{o}{==} \PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{,} \PY{k+kc}{True}\PY{p}{,} \PY{k+kc}{False}\PY{p}{)}
+\PY{n}{iso\PYZus{}scores} \PY{o}{=} \PY{o}{\PYZhy{}}\PY{n}{best\PYZus{}iso\PYZus{}forest}\PY{o}{.}\PY{n}{decision\PYZus{}function}\PY{p}{(}\PY{n}{turbidity}\PY{p}{)}
+\PY{n}{iso\PYZus{}time} \PY{o}{+}\PY{o}{=} \PY{n}{time}\PY{o}{.}\PY{n}{time}\PY{p}{(}\PY{p}{)} \PY{o}{\PYZhy{}} \PY{n}{start\PYZus{}time}  \PY{c+c1}{\PYZsh{} Add time taken for training and prediction}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Isolation forest (Turbidity): }\PY{l+s+si}{\PYZob{}}\PY{n}{best\PYZus{}iso\PYZus{}forest}\PY{o}{.}\PY{n}{get\PYZus{}params}\PY{p}{(}\PY{p}{)}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+
+\PY{c+c1}{\PYZsh{} Timing Local Outlier Factor}
+\PY{n}{start\PYZus{}time} \PY{o}{=} \PY{n}{time}\PY{o}{.}\PY{n}{time}\PY{p}{(}\PY{p}{)}
+\PY{n}{lof} \PY{o}{=} \PY{n}{LocalOutlierFactor}\PY{p}{(}\PY{p}{)}
+\PY{n}{param\PYZus{}grid} \PY{o}{=} \PY{p}{\PYZob{}}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{n\PYZus{}neighbors}\PY{l+s+s1}{\PYZsq{}}\PY{p}{:} \PY{p}{[}\PY{l+m+mi}{10}\PY{p}{,} \PY{l+m+mi}{20}\PY{p}{,} \PY{l+m+mi}{30}\PY{p}{]}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{contamination}\PY{l+s+s1}{\PYZsq{}}\PY{p}{:} \PY{p}{[}\PY{l+m+mf}{0.05}\PY{p}{,} \PY{l+m+mf}{0.1}\PY{p}{,} \PY{l+m+mf}{0.15}\PY{p}{]}\PY{p}{\PYZcb{}}
+\PY{n}{grid\PYZus{}search\PYZus{}lof} \PY{o}{=} \PY{n}{GridSearchCV}\PY{p}{(}\PY{n}{lof}\PY{p}{,} \PY{n}{param\PYZus{}grid}\PY{p}{,} \PY{n}{scoring}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{accuracy}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{cv}\PY{o}{=}\PY{l+m+mi}{3}\PY{p}{,} \PY{n}{verbose}\PY{o}{=}\PY{k+kc}{True}\PY{p}{)}
+\PY{n}{grid\PYZus{}search\PYZus{}lof}\PY{o}{.}\PY{n}{fit}\PY{p}{(}\PY{n}{turbidity}\PY{p}{)}
+\PY{n}{lof\PYZus{}time} \PY{o}{=} \PY{n}{time}\PY{o}{.}\PY{n}{time}\PY{p}{(}\PY{p}{)} \PY{o}{\PYZhy{}} \PY{n}{start\PYZus{}time}
+\PY{n}{best\PYZus{}lof} \PY{o}{=} \PY{n}{grid\PYZus{}search\PYZus{}lof}\PY{o}{.}\PY{n}{best\PYZus{}estimator\PYZus{}}
+\PY{n}{start\PYZus{}time} \PY{o}{=} \PY{n}{time}\PY{o}{.}\PY{n}{time}\PY{p}{(}\PY{p}{)}  \PY{c+c1}{\PYZsh{} Start timing after finding the best estimator}
+\PY{n}{lof\PYZus{}anomalies} \PY{o}{=} \PY{n}{best\PYZus{}lof}\PY{o}{.}\PY{n}{fit\PYZus{}predict}\PY{p}{(}\PY{n}{turbidity}\PY{p}{)}
+\PY{n}{lof\PYZus{}anomalies} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{where}\PY{p}{(}\PY{n}{lof\PYZus{}anomalies} \PY{o}{==} \PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{,} \PY{k+kc}{True}\PY{p}{,} \PY{k+kc}{False}\PY{p}{)}
+\PY{n}{lof\PYZus{}scores} \PY{o}{=} \PY{o}{\PYZhy{}}\PY{n}{best\PYZus{}lof}\PY{o}{.}\PY{n}{negative\PYZus{}outlier\PYZus{}factor\PYZus{}}
+\PY{n}{lof\PYZus{}time} \PY{o}{+}\PY{o}{=} \PY{n}{time}\PY{o}{.}\PY{n}{time}\PY{p}{(}\PY{p}{)} \PY{o}{\PYZhy{}} \PY{n}{start\PYZus{}time}  \PY{c+c1}{\PYZsh{} Add time taken for training and prediction}
+
+\PY{c+c1}{\PYZsh{} Timing Robust Random Cut Forest}
+\PY{n}{start\PYZus{}time} \PY{o}{=} \PY{n}{time}\PY{o}{.}\PY{n}{time}\PY{p}{(}\PY{p}{)}
+\PY{n}{forest} \PY{o}{=} \PY{n}{rrcf}\PY{o}{.}\PY{n}{RCTree}\PY{p}{(}\PY{p}{)}
+\PY{k}{for} \PY{n}{i}\PY{p}{,} \PY{n}{point} \PY{o+ow}{in} \PY{n+nb}{enumerate}\PY{p}{(}\PY{n}{turbidity}\PY{o}{.}\PY{n}{values}\PY{p}{)}\PY{p}{:}
+    \PY{n}{forest}\PY{o}{.}\PY{n}{insert\PYZus{}point}\PY{p}{(}\PY{n}{point}\PY{p}{,} \PY{n}{index}\PY{o}{=}\PY{n}{i}\PY{p}{)}
+\PY{n}{rrcf\PYZus{}time} \PY{o}{=} \PY{n}{time}\PY{o}{.}\PY{n}{time}\PY{p}{(}\PY{p}{)} \PY{o}{\PYZhy{}} \PY{n}{start\PYZus{}time}
+\PY{n}{rrcf\PYZus{}scores} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{p}{[}\PY{n}{forest}\PY{o}{.}\PY{n}{codisp}\PY{p}{(}\PY{n}{i}\PY{p}{)} \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{n+nb}{len}\PY{p}{(}\PY{n}{turbidity}\PY{p}{)}\PY{p}{)}\PY{p}{]}\PY{p}{)}
+\PY{n}{threshold} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{percentile}\PY{p}{(}\PY{n}{rrcf\PYZus{}scores}\PY{p}{,} \PY{l+m+mi}{90}\PY{p}{)}
+\PY{n}{rrcf\PYZus{}anomalies} \PY{o}{=} \PY{n}{rrcf\PYZus{}scores} \PY{o}{\PYZgt{}} \PY{n}{threshold}
+
+\PY{n}{data}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{iso\PYZus{}anomalies\PYZus{}turbidity}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{n}{iso\PYZus{}anomalies}
+\PY{n}{data}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{iso\PYZus{}scores\PYZus{}turbidity}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{n}{iso\PYZus{}scores}
+\PY{n}{data}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{lof\PYZus{}anomalies\PYZus{}turbidity}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{n}{lof\PYZus{}anomalies}
+\PY{n}{data}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{lof\PYZus{}scores\PYZus{}turbidity}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{n}{lof\PYZus{}scores}
+\PY{n}{data}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{rrcf\PYZus{}anomalies\PYZus{}turbidity}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{n}{rrcf\PYZus{}anomalies}
+\PY{n}{data}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{rrcf\PYZus{}scores\PYZus{}turbidity}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{n}{rrcf\PYZus{}scores}
+
+\PY{c+c1}{\PYZsh{} Step 4: Visualize the anomalies}
+\PY{n}{fig}\PY{p}{,} \PY{n}{axs} \PY{o}{=} \PY{n}{plt}\PY{o}{.}\PY{n}{subplots}\PY{p}{(}\PY{l+m+mi}{3}\PY{p}{,} \PY{l+m+mi}{2}\PY{p}{,} \PY{n}{figsize}\PY{o}{=}\PY{p}{(}\PY{l+m+mi}{15}\PY{p}{,} \PY{l+m+mi}{15}\PY{p}{)}\PY{p}{)}
+
+\PY{c+c1}{\PYZsh{} Plot for Isolation Forest (Turbidity)}
+\PY{n}{plot\PYZus{}anomalies}\PY{p}{(}\PY{n}{turbidity}\PY{p}{,} \PY{n}{iso\PYZus{}anomalies}\PY{p}{,} \PY{n}{iso\PYZus{}scores}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Isolation Forest Anomalies (Turbidity)}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{axs}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,} \PY{l+m+mi}{0}\PY{p}{]}\PY{p}{)}
+
+\PY{c+c1}{\PYZsh{} Plot for Local Outlier Factor (Turbidity)}
+\PY{n}{plot\PYZus{}anomalies}\PY{p}{(}\PY{n}{turbidity}\PY{p}{,} \PY{n}{lof\PYZus{}anomalies}\PY{p}{,} \PY{n}{lof\PYZus{}scores}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Local Outlier Factor Anomalies (Turbidity)}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{axs}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{,} \PY{l+m+mi}{0}\PY{p}{]}\PY{p}{)}
+
+\PY{c+c1}{\PYZsh{} Plot for Robust Random Cut Forest (Turbidity)}
+\PY{n}{plot\PYZus{}anomalies}\PY{p}{(}\PY{n}{turbidity}\PY{p}{,} \PY{n}{rrcf\PYZus{}anomalies}\PY{p}{,} \PY{n}{rrcf\PYZus{}scores}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Robust Random Cut Forest Anomalies (Turbidity)}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{axs}\PY{p}{[}\PY{l+m+mi}{2}\PY{p}{,} \PY{l+m+mi}{0}\PY{p}{]}\PY{p}{)}
+
+\PY{c+c1}{\PYZsh{} Repeat the process for pH}
+
+\PY{c+c1}{\PYZsh{} Timing Isolation Forest (pH)}
+\PY{n}{start\PYZus{}time} \PY{o}{=} \PY{n}{time}\PY{o}{.}\PY{n}{time}\PY{p}{(}\PY{p}{)}
+\PY{n}{grid\PYZus{}search\PYZus{}iso}\PY{o}{.}\PY{n}{fit}\PY{p}{(}\PY{n}{pH}\PY{p}{)}
+\PY{n}{iso\PYZus{}time\PYZus{}pH} \PY{o}{=} \PY{n}{time}\PY{o}{.}\PY{n}{time}\PY{p}{(}\PY{p}{)} \PY{o}{\PYZhy{}} \PY{n}{start\PYZus{}time}
+\PY{n}{best\PYZus{}iso\PYZus{}forest} \PY{o}{=} \PY{n}{grid\PYZus{}search\PYZus{}iso}\PY{o}{.}\PY{n}{best\PYZus{}estimator\PYZus{}}
+\PY{n}{start\PYZus{}time} \PY{o}{=} \PY{n}{time}\PY{o}{.}\PY{n}{time}\PY{p}{(}\PY{p}{)}  \PY{c+c1}{\PYZsh{} Start timing after finding the best estimator}
+\PY{n}{iso\PYZus{}anomalies} \PY{o}{=} \PY{n}{best\PYZus{}iso\PYZus{}forest}\PY{o}{.}\PY{n}{predict}\PY{p}{(}\PY{n}{pH}\PY{p}{)}
+\PY{n}{iso\PYZus{}anomalies} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{where}\PY{p}{(}\PY{n}{iso\PYZus{}anomalies} \PY{o}{==} \PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{,} \PY{k+kc}{True}\PY{p}{,} \PY{k+kc}{False}\PY{p}{)}
+\PY{n}{iso\PYZus{}scores} \PY{o}{=} \PY{o}{\PYZhy{}}\PY{n}{best\PYZus{}iso\PYZus{}forest}\PY{o}{.}\PY{n}{decision\PYZus{}function}\PY{p}{(}\PY{n}{pH}\PY{p}{)}
+\PY{n}{iso\PYZus{}time\PYZus{}pH} \PY{o}{+}\PY{o}{=} \PY{n}{time}\PY{o}{.}\PY{n}{time}\PY{p}{(}\PY{p}{)} \PY{o}{\PYZhy{}} \PY{n}{start\PYZus{}time}  \PY{c+c1}{\PYZsh{} Add time taken for training and prediction}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Isolation forest (pH): }\PY{l+s+si}{\PYZob{}}\PY{n}{best\PYZus{}iso\PYZus{}forest}\PY{o}{.}\PY{n}{get\PYZus{}params}\PY{p}{(}\PY{p}{)}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+
+\PY{c+c1}{\PYZsh{} Timing Local Outlier Factor (pH)}
+\PY{n}{start\PYZus{}time} \PY{o}{=} \PY{n}{time}\PY{o}{.}\PY{n}{time}\PY{p}{(}\PY{p}{)}
+\PY{n}{grid\PYZus{}search\PYZus{}lof}\PY{o}{.}\PY{n}{fit}\PY{p}{(}\PY{n}{pH}\PY{p}{)}
+\PY{n}{lof\PYZus{}time\PYZus{}pH} \PY{o}{=} \PY{n}{time}\PY{o}{.}\PY{n}{time}\PY{p}{(}\PY{p}{)} \PY{o}{\PYZhy{}} \PY{n}{start\PYZus{}time}
+\PY{n}{best\PYZus{}lof} \PY{o}{=} \PY{n}{grid\PYZus{}search\PYZus{}lof}\PY{o}{.}\PY{n}{best\PYZus{}estimator\PYZus{}}
+\PY{n}{start\PYZus{}time} \PY{o}{=} \PY{n}{time}\PY{o}{.}\PY{n}{time}\PY{p}{(}\PY{p}{)}  \PY{c+c1}{\PYZsh{} Start timing after finding the best estimator}
+\PY{n}{lof\PYZus{}anomalies} \PY{o}{=} \PY{n}{best\PYZus{}lof}\PY{o}{.}\PY{n}{fit\PYZus{}predict}\PY{p}{(}\PY{n}{pH}\PY{p}{)}
+\PY{n}{lof\PYZus{}anomalies} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{where}\PY{p}{(}\PY{n}{lof\PYZus{}anomalies} \PY{o}{==} \PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{,} \PY{k+kc}{True}\PY{p}{,} \PY{k+kc}{False}\PY{p}{)}
+\PY{n}{lof\PYZus{}scores} \PY{o}{=} \PY{o}{\PYZhy{}}\PY{n}{best\PYZus{}lof}\PY{o}{.}\PY{n}{negative\PYZus{}outlier\PYZus{}factor\PYZus{}}
+\PY{n}{lof\PYZus{}time\PYZus{}pH} \PY{o}{+}\PY{o}{=} \PY{n}{time}\PY{o}{.}\PY{n}{time}\PY{p}{(}\PY{p}{)} \PY{o}{\PYZhy{}} \PY{n}{start\PYZus{}time}  \PY{c+c1}{\PYZsh{} Add time taken for training and prediction}
+
+\PY{c+c1}{\PYZsh{} Timing Robust Random Cut Forest (pH)}
+\PY{n}{start\PYZus{}time} \PY{o}{=} \PY{n}{time}\PY{o}{.}\PY{n}{time}\PY{p}{(}\PY{p}{)}
+\PY{n}{forest} \PY{o}{=} \PY{n}{rrcf}\PY{o}{.}\PY{n}{RCTree}\PY{p}{(}\PY{p}{)}
+\PY{k}{for} \PY{n}{i}\PY{p}{,} \PY{n}{point} \PY{o+ow}{in} \PY{n+nb}{enumerate}\PY{p}{(}\PY{n}{pH}\PY{o}{.}\PY{n}{values}\PY{p}{)}\PY{p}{:}
+    \PY{n}{forest}\PY{o}{.}\PY{n}{insert\PYZus{}point}\PY{p}{(}\PY{n}{point}\PY{p}{,} \PY{n}{index}\PY{o}{=}\PY{n}{i}\PY{p}{)}
+\PY{n}{rrcf\PYZus{}time\PYZus{}pH} \PY{o}{=} \PY{n}{time}\PY{o}{.}\PY{n}{time}\PY{p}{(}\PY{p}{)} \PY{o}{\PYZhy{}} \PY{n}{start\PYZus{}time}
+\PY{n}{rrcf\PYZus{}scores} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{p}{[}\PY{n}{forest}\PY{o}{.}\PY{n}{codisp}\PY{p}{(}\PY{n}{i}\PY{p}{)} \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{n+nb}{len}\PY{p}{(}\PY{n}{pH}\PY{p}{)}\PY{p}{)}\PY{p}{]}\PY{p}{)}
+\PY{n}{threshold} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{percentile}\PY{p}{(}\PY{n}{rrcf\PYZus{}scores}\PY{p}{,} \PY{l+m+mi}{90}\PY{p}{)}
+\PY{n}{rrcf\PYZus{}anomalies} \PY{o}{=} \PY{n}{rrcf\PYZus{}scores} \PY{o}{\PYZgt{}} \PY{n}{threshold}
+
+\PY{n}{data}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{iso\PYZus{}anomalies\PYZus{}pH}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{n}{iso\PYZus{}anomalies}
+\PY{n}{data}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{iso\PYZus{}scores\PYZus{}pH}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{n}{iso\PYZus{}scores}
+\PY{n}{data}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{lof\PYZus{}anomalies\PYZus{}pH}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{n}{lof\PYZus{}anomalies}
+\PY{n}{data}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{lof\PYZus{}scores\PYZus{}pH}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{n}{lof\PYZus{}scores}
+\PY{n}{data}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{rrcf\PYZus{}anomalies\PYZus{}pH}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{n}{rrcf\PYZus{}anomalies}
+\PY{n}{data}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{rrcf\PYZus{}scores\PYZus{}pH}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{n}{rrcf\PYZus{}scores}
+
+\PY{c+c1}{\PYZsh{} Plot for Isolation Forest (pH)}
+\PY{n}{plot\PYZus{}anomalies}\PY{p}{(}\PY{n}{pH}\PY{p}{,} \PY{n}{iso\PYZus{}anomalies}\PY{p}{,} \PY{n}{iso\PYZus{}scores}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Isolation Forest Anomalies (pH)}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{axs}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,} \PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}
+
+\PY{c+c1}{\PYZsh{} Plot for Local Outlier Factor (pH)}
+\PY{n}{plot\PYZus{}anomalies}\PY{p}{(}\PY{n}{pH}\PY{p}{,} \PY{n}{lof\PYZus{}anomalies}\PY{p}{,} \PY{n}{lof\PYZus{}scores}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Local Outlier Factor Anomalies (pH)}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{axs}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{,} \PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}
+
+\PY{c+c1}{\PYZsh{} Plot for Robust Random Cut Forest (pH)}
+\PY{n}{plot\PYZus{}anomalies}\PY{p}{(}\PY{n}{pH}\PY{p}{,} \PY{n}{rrcf\PYZus{}anomalies}\PY{p}{,} \PY{n}{rrcf\PYZus{}scores}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Robust Random Cut Forest Anomalies (pH)}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{axs}\PY{p}{[}\PY{l+m+mi}{2}\PY{p}{,} \PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}
+
+\PY{n}{plt}\PY{o}{.}\PY{n}{tight\PYZus{}layout}\PY{p}{(}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{show}\PY{p}{(}\PY{p}{)}
+
+\PY{c+c1}{\PYZsh{} Save the data with anomaly scores}
+\PY{n}{data}\PY{o}{.}\PY{n}{to\PYZus{}csv}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{data\PYZus{}aw\PYZus{}water\PYZus{}anomalies\PYZus{}anomaly\PYZus{}scores.csv}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+
+\PY{c+c1}{\PYZsh{} Print the timing results}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Isolation Forest time (Turbidity): }\PY{l+s+si}{\PYZob{}}\PY{n}{iso\PYZus{}time}\PY{l+s+si}{:}\PY{l+s+s2}{.2f}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{ seconds}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Local Outlier Factor time (Turbidity): }\PY{l+s+si}{\PYZob{}}\PY{n}{lof\PYZus{}time}\PY{l+s+si}{:}\PY{l+s+s2}{.2f}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{ seconds}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Robust Random Cut Forest time (Turbidity): }\PY{l+s+si}{\PYZob{}}\PY{n}{rrcf\PYZus{}time}\PY{l+s+si}{:}\PY{l+s+s2}{.2f}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{ seconds}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Isolation Forest time (pH): }\PY{l+s+si}{\PYZob{}}\PY{n}{iso\PYZus{}time\PYZus{}pH}\PY{l+s+si}{:}\PY{l+s+s2}{.2f}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{ seconds}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Local Outlier Factor time (pH): }\PY{l+s+si}{\PYZob{}}\PY{n}{lof\PYZus{}time\PYZus{}pH}\PY{l+s+si}{:}\PY{l+s+s2}{.2f}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{ seconds}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Robust Random Cut Forest time (pH): }\PY{l+s+si}{\PYZob{}}\PY{n}{rrcf\PYZus{}time\PYZus{}pH}\PY{l+s+si}{:}\PY{l+s+s2}{.2f}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{ seconds}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+Fitting 3 folds for each of 9 candidates, totalling 27 fits
+Isolation forest (Turbidity): \{'bootstrap': False, 'contamination': 0.05,
+'max\_features': 1.0, 'max\_samples': 'auto', 'n\_estimators': 50, 'n\_jobs': None,
+'random\_state': None, 'verbose': 0, 'warm\_start': False\}
+Fitting 3 folds for each of 9 candidates, totalling 27 fits
+Fitting 3 folds for each of 9 candidates, totalling 27 fits
+Isolation forest (pH): \{'bootstrap': False, 'contamination': 0.05,
+'max\_features': 1.0, 'max\_samples': 'auto', 'n\_estimators': 50, 'n\_jobs': None,
+'random\_state': None, 'verbose': 0, 'warm\_start': False\}
+Fitting 3 folds for each of 9 candidates, totalling 27 fits
+    \end{Verbatim}
+
+    \begin{center}
+    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{output_15_1.png}
+    \end{center}
+    { \hspace*{\fill} \\}
+    
+    \begin{Verbatim}[commandchars=\\\{\}]
+Isolation Forest time (Turbidity): 5.87 seconds
+Local Outlier Factor time (Turbidity): 0.28 seconds
+Robust Random Cut Forest time (Turbidity): 2.09 seconds
+Isolation Forest time (pH): 5.64 seconds
+Local Outlier Factor time (pH): 0.65 seconds
+Robust Random Cut Forest time (pH): 32.62 seconds
+    \end{Verbatim}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{14}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{data}\PY{o}{.}\PY{n}{to\PYZus{}csv}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{data\PYZus{}aw\PYZus{}water\PYZus{}anomalies\PYZus{}amomaly\PYZus{}scores.csv}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n}{data}
+\end{Verbatim}
+\end{tcolorbox}
+
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{14}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+                                 time  turbidity    pH  \textbackslash{}
+0    2020-11-04 11:00:31.822439+00:00  21.063435  7.34
+1    2020-11-04 11:01:22.124333+00:00  20.868153  7.33
+2    2020-11-04 11:01:51.663062+00:00  20.584553  7.32
+3    2020-11-04 11:02:29.373718+00:00  21.185328  7.33
+4    2020-11-04 11:03:45.517010+00:00  21.063435  7.32
+{\ldots}                               {\ldots}        {\ldots}   {\ldots}
+2653 2021-01-04 07:53:20.987423+00:00  10.611506  7.35
+2654 2021-01-04 08:23:37.035804+00:00  17.975997  7.35
+2655 2021-01-04 08:53:53.104009+00:00  17.734662  7.34
+2656 2021-01-04 09:24:09.578901+00:00  15.094176  7.36
+2657 2021-01-04 09:54:25.214766+00:00  14.611506  7.36
+
+      iso\_anomalies\_turbidity  iso\_scores\_turbidity  lof\_anomalies\_turbidity  \textbackslash{}
+0                       False             -0.192471                    False
+1                       False             -0.205637                    False
+2                       False             -0.202352                    False
+3                       False             -0.193440                    False
+4                       False             -0.192471                    False
+{\ldots}                       {\ldots}                   {\ldots}                      {\ldots}
+2653                    False             -0.139984                    False
+2654                    False             -0.279035                    False
+2655                    False             -0.282716                    False
+2656                    False             -0.235026                    False
+2657                    False             -0.238871                    False
+
+      lof\_scores\_turbidity  rrcf\_anomalies\_turbidity  rrcf\_scores\_turbidity  \textbackslash{}
+0             1.732049e+00                     False               5.974063
+1             1.079480e+08                     False               8.500000
+2             1.011609e+00                     False               5.974063
+3             1.053255e+00                     False               5.974063
+4             1.732049e+00                     False              33.000000
+{\ldots}                    {\ldots}                       {\ldots}                    {\ldots}
+2653          1.000000e+00                     False               9.452381
+2654          1.000000e+00                     False               3.643836
+2655          1.000000e+00                     False               0.943503
+2656          1.000000e+00                     False               3.600000
+2657          1.001448e+00                     False               6.642857
+
+      iso\_anomalies\_pH  iso\_scores\_pH  lof\_anomalies\_pH  lof\_scores\_pH  \textbackslash{}
+0                False      -0.137496             False   1.000000e+00
+1                 True       0.043989             False   1.000000e+00
+2                 True       0.117731              True   8.000000e+07
+3                 True       0.043989             False   1.000000e+00
+4                 True       0.117731              True   8.000000e+07
+{\ldots}                {\ldots}            {\ldots}               {\ldots}            {\ldots}
+2653             False      -0.263685             False   1.000000e+00
+2654             False      -0.263685             False   1.000000e+00
+2655             False      -0.137496             False   1.000000e+00
+2656             False      -0.192363             False   1.000000e+00
+2657             False      -0.192363             False   1.000000e+00
+
+      rrcf\_anomalies\_pH  rrcf\_scores\_pH
+0                 False        1.000000
+1                 False        8.099644
+2                 False      213.083333
+3                 False        8.099644
+4                 False      213.083333
+{\ldots}                 {\ldots}             {\ldots}
+2653              False        2.000000
+2654              False        1.000000
+2655              False       34.000000
+2656              False        3.183824
+2657              False        3.183824
+
+[2658 rows x 15 columns]
+\end{Verbatim}
+\end{tcolorbox}
+        
+    \hypertarget{models-evaluation-on-turbidity}{%
+\section{Models evaluation on
+(turbidity)}\label{models-evaluation-on-turbidity}}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{15}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{turb\PYZus{}anomalies} \PY{o}{=} \PY{n}{true\PYZus{}anomalies}  \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{read\PYZus{}csv}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{turbidity\PYZus{}anomalies.csv}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n}{turb\PYZus{}anomalies}\PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{turbidity}\PY{l+s+s2}{\PYZdq{}}\PY{p}{]}  \PY{o}{=} \PY{n}{turb\PYZus{}anomalies}\PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{turbidity\PYZus{}anomaly}\PY{l+s+s2}{\PYZdq{}}\PY{p}{]}
+\PY{n}{turb\PYZus{}anomalies} \PY{o}{=} \PY{n}{turb\PYZus{}anomalies}\PY{o}{.}\PY{n}{drop}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{turbidity\PYZus{}anomaly}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{axis} \PY{o}{=}\PY{l+m+mi}{1}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{16}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k+kn}{import} \PY{n+nn}{pandas} \PY{k}{as} \PY{n+nn}{pd}
+
+\PY{c+c1}{\PYZsh{} Load the anomaly scores from the trained models}
+\PY{n}{anomaly\PYZus{}scores} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{read\PYZus{}csv}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{data\PYZus{}aw\PYZus{}water\PYZus{}anomalies\PYZus{}amomaly\PYZus{}scores.csv}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+
+\PY{c+c1}{\PYZsh{} Load the ground truth data}
+\PY{n}{turbidity\PYZus{}true\PYZus{}anomalies} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{read\PYZus{}csv}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{turbidity\PYZus{}true\PYZus{}anomalies\PYZus{}2.csv}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+\PY{n}{ph\PYZus{}true\PYZus{}anomalies} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{read\PYZus{}csv}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{ph\PYZus{}true\PYZus{}anomalies\PYZus{}2.csv}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{17}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{turb\PYZus{}eval} \PY{o}{=} \PY{n}{anomaly\PYZus{}scores}\PY{o}{.}\PY{n}{merge}\PY{p}{(}\PY{n}{turbidity\PYZus{}true\PYZus{}anomalies}\PY{p}{,} \PY{n}{how}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{inner}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{on}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{turbidity}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n}{turb\PYZus{}eval}
+\end{Verbatim}
+\end{tcolorbox}
+
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{17}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+     Unnamed: 0                            time\_x  turbidity    pH  \textbackslash{}
+0            81  2020-11-06 00:05:15.172488+00:00  50.856159  7.35
+1            81  2020-11-06 00:05:15.172488+00:00  50.856159  7.35
+2            81  2020-11-06 00:05:15.172488+00:00  50.856159  7.35
+3            82  2020-11-06 00:35:31.220269+00:00  49.734662  7.35
+4           104  2020-11-06 12:11:40.267604+00:00  50.856159  7.35
+..          {\ldots}                               {\ldots}        {\ldots}   {\ldots}
+211        2554  2021-01-02 02:55:08.469556+00:00  51.856159  7.36
+212        2554  2021-01-02 02:55:08.469556+00:00  51.856159  7.36
+213        2558  2021-01-02 04:56:12.732646+00:00  51.856159  7.35
+214        2558  2021-01-02 04:56:12.732646+00:00  51.856159  7.35
+215        2558  2021-01-02 04:56:12.732646+00:00  51.856159  7.35
+
+     iso\_anomalies\_turbidity  iso\_scores\_turbidity  lof\_anomalies\_turbidity  \textbackslash{}
+0                      False             -0.012438                    False
+1                      False             -0.012438                    False
+2                      False             -0.012438                    False
+3                      False             -0.015770                    False
+4                      False             -0.012438                    False
+..                       {\ldots}                   {\ldots}                      {\ldots}
+211                    False             -0.007531                    False
+212                    False             -0.007531                    False
+213                    False             -0.007531                    False
+214                    False             -0.007531                    False
+215                    False             -0.007531                    False
+
+     lof\_scores\_turbidity  rrcf\_anomalies\_turbidity  rrcf\_scores\_turbidity  \textbackslash{}
+0                1.005945                     False              26.304348
+1                1.005945                     False              26.304348
+2                1.005945                     False              26.304348
+3                0.953425                     False              26.304348
+4                1.005945                     False              26.304348
+..                    {\ldots}                       {\ldots}                    {\ldots}
+211              1.130842                     False              26.304348
+212              1.130842                     False              26.304348
+213              1.130842                     False              26.304348
+214              1.130842                     False              26.304348
+215              1.130842                     False              26.304348
+
+     iso\_anomalies\_pH  iso\_scores\_pH  lof\_anomalies\_pH  lof\_scores\_pH  \textbackslash{}
+0               False      -0.263685             False            1.0
+1               False      -0.263685             False            1.0
+2               False      -0.263685             False            1.0
+3               False      -0.263685             False            1.0
+4               False      -0.263685             False            1.0
+..                {\ldots}            {\ldots}               {\ldots}            {\ldots}
+211             False      -0.192363             False            1.0
+212             False      -0.192363             False            1.0
+213             False      -0.263685             False            1.0
+214             False      -0.263685             False            1.0
+215             False      -0.263685             False            1.0
+
+     rrcf\_anomalies\_pH  rrcf\_scores\_pH                            time\_y
+0                 True     1681.000000  2020-11-06 00:05:15.172488+00:00
+1                 True     1681.000000  2020-11-06 12:11:40.267604+00:00
+2                 True     1681.000000  2020-12-02 03:29:58.649298+00:00
+3                 True     1680.000000  2020-11-06 00:35:31.220269+00:00
+4                 True     1664.000000  2020-11-06 00:05:15.172488+00:00
+..                 {\ldots}             {\ldots}                               {\ldots}
+211              False        3.183824  2021-01-02 02:55:08.469556+00:00
+212              False        3.183824  2021-01-02 04:56:12.732646+00:00
+213              False       62.000000  2021-01-02 00:54:04.232075+00:00
+214              False       62.000000  2021-01-02 02:55:08.469556+00:00
+215              False       62.000000  2021-01-02 04:56:12.732646+00:00
+
+[216 rows x 17 columns]
+\end{Verbatim}
+\end{tcolorbox}
+        
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{18}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{ph\PYZus{}eval} \PY{o}{=} \PY{n}{anomaly\PYZus{}scores}\PY{o}{.}\PY{n}{merge}\PY{p}{(}\PY{n}{ph\PYZus{}true\PYZus{}anomalies}\PY{p}{,} \PY{n}{how}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{inner}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{on}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{pH}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n}{ph\PYZus{}eval}
+\end{Verbatim}
+\end{tcolorbox}
+
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{18}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+      Unnamed: 0                            time\_x  turbidity    pH  \textbackslash{}
+0              1  2020-11-04 11:01:22.124333+00:00  20.868153  7.33
+1              1  2020-11-04 11:01:22.124333+00:00  20.868153  7.33
+2              1  2020-11-04 11:01:22.124333+00:00  20.868153  7.33
+3              1  2020-11-04 11:01:22.124333+00:00  20.868153  7.33
+4              1  2020-11-04 11:01:22.124333+00:00  20.868153  7.33
+{\ldots}          {\ldots}                               {\ldots}        {\ldots}   {\ldots}
+1714        2626  2021-01-03 17:45:51.270365+00:00  18.325558  7.33
+1715        2626  2021-01-03 17:45:51.270365+00:00  18.325558  7.33
+1716        2626  2021-01-03 17:45:51.270365+00:00  18.325558  7.33
+1717        2626  2021-01-03 17:45:51.270365+00:00  18.325558  7.33
+1718        2626  2021-01-03 17:45:51.270365+00:00  18.325558  7.33
+
+      iso\_anomalies\_turbidity  iso\_scores\_turbidity  lof\_anomalies\_turbidity  \textbackslash{}
+0                       False             -0.205637                    False
+1                       False             -0.205637                    False
+2                       False             -0.205637                    False
+3                       False             -0.205637                    False
+4                       False             -0.205637                    False
+{\ldots}                       {\ldots}                   {\ldots}                      {\ldots}
+1714                    False             -0.248070                     True
+1715                    False             -0.248070                     True
+1716                    False             -0.248070                     True
+1717                    False             -0.248070                     True
+1718                    False             -0.248070                     True
+
+      lof\_scores\_turbidity  rrcf\_anomalies\_turbidity  rrcf\_scores\_turbidity  \textbackslash{}
+0             1.079480e+08                     False               8.500000
+1             1.079480e+08                     False               8.500000
+2             1.079480e+08                     False               8.500000
+3             1.079480e+08                     False               8.500000
+4             1.079480e+08                     False               8.500000
+{\ldots}                    {\ldots}                       {\ldots}                    {\ldots}
+1714          2.194725e+08                     False              18.857143
+1715          2.194725e+08                     False              18.857143
+1716          2.194725e+08                     False              18.857143
+1717          2.194725e+08                     False              18.857143
+1718          2.194725e+08                     False              18.857143
+
+      iso\_anomalies\_pH  iso\_scores\_pH  lof\_anomalies\_pH  lof\_scores\_pH  \textbackslash{}
+0                 True       0.043989             False            1.0
+1                 True       0.043989             False            1.0
+2                 True       0.043989             False            1.0
+3                 True       0.043989             False            1.0
+4                 True       0.043989             False            1.0
+{\ldots}                {\ldots}            {\ldots}               {\ldots}            {\ldots}
+1714              True       0.043989             False            1.0
+1715              True       0.043989             False            1.0
+1716              True       0.043989             False            1.0
+1717              True       0.043989             False            1.0
+1718              True       0.043989             False            1.0
+
+      rrcf\_anomalies\_pH  rrcf\_scores\_pH                            time\_y
+0                 False        8.099644  2020-11-04 11:01:22.124333+00:00
+1                 False        8.099644  2020-11-04 11:02:29.373718+00:00
+2                 False        8.099644  2020-11-04 11:05:01.621475+00:00
+3                 False        8.099644  2020-11-04 11:21:25.498204+00:00
+4                 False        8.099644  2020-11-05 08:12:48.104690+00:00
+{\ldots}                 {\ldots}             {\ldots}                               {\ldots}
+1714              False        8.099644  2020-12-26 14:03:51.090294+00:00
+1715              False        8.099644  2020-12-26 17:35:43.531456+00:00
+1716              False        8.099644  2020-12-29 05:37:06.277708+00:00
+1717              False        8.099644  2020-12-29 16:42:59.647885+00:00
+1718              False        8.099644  2021-01-03 17:45:51.270365+00:00
+
+[1719 rows x 17 columns]
+\end{Verbatim}
+\end{tcolorbox}
+        
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{19}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{turb\PYZus{}eval}\PY{o}{.}\PY{n}{columns}
+\end{Verbatim}
+\end{tcolorbox}
+
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{19}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+Index(['Unnamed: 0', 'time\_x', 'turbidity', 'pH', 'iso\_anomalies\_turbidity',
+       'iso\_scores\_turbidity', 'lof\_anomalies\_turbidity',
+       'lof\_scores\_turbidity', 'rrcf\_anomalies\_turbidity',
+       'rrcf\_scores\_turbidity', 'iso\_anomalies\_pH', 'iso\_scores\_pH',
+       'lof\_anomalies\_pH', 'lof\_scores\_pH', 'rrcf\_anomalies\_pH',
+       'rrcf\_scores\_pH', 'time\_y'],
+      dtype='object')
+\end{Verbatim}
+\end{tcolorbox}
+        
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{20}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k+kn}{import} \PY{n+nn}{pandas} \PY{k}{as} \PY{n+nn}{pd}
+
+\PY{c+c1}{\PYZsh{} Example dictionary containing anomaly counts}
+\PY{n}{turbidity\PYZus{}ml\PYZus{}performance} \PY{o}{=} \PY{p}{\PYZob{}}
+    \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Turbidity\PYZus{}isolation\PYZus{}forest}\PY{l+s+s2}{\PYZdq{}}\PY{p}{:} \PY{p}{[}\PY{n+nb}{len}\PY{p}{(}\PY{p}{[}\PY{n}{i} \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n}{turb\PYZus{}eval}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{iso\PYZus{}anomalies\PYZus{}turbidity}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{k}{if} \PY{n}{i} \PY{o}{==} \PY{k+kc}{True}\PY{p}{]}\PY{p}{)}\PY{p}{]}\PY{p}{,}
+    \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Turbidity\PYZus{}local\PYZus{}factor\PYZus{}outlier}\PY{l+s+s2}{\PYZdq{}}\PY{p}{:} \PY{p}{[}\PY{n+nb}{len}\PY{p}{(}\PY{p}{[}\PY{n}{i} \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n}{turb\PYZus{}eval}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{lof\PYZus{}anomalies\PYZus{}turbidity}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{k}{if} \PY{n}{i} \PY{o}{==} \PY{k+kc}{True}\PY{p}{]}\PY{p}{)}\PY{p}{]}\PY{p}{,}
+    \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Turbidity\PYZus{}rrcf}\PY{l+s+s2}{\PYZdq{}}\PY{p}{:} \PY{p}{[}\PY{n+nb}{len}\PY{p}{(}\PY{p}{[}\PY{n}{i} \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n}{turb\PYZus{}eval}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{rrcf\PYZus{}anomalies\PYZus{}turbidity}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{k}{if} \PY{n}{i} \PY{o}{==} \PY{k+kc}{True}\PY{p}{]}\PY{p}{)}\PY{p}{]}
+\PY{p}{\PYZcb{}}
+
+\PY{c+c1}{\PYZsh{} Create the DataFrame}
+\PY{n}{turb\PYZus{}model\PYZus{}detection} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{DataFrame}\PY{p}{(}\PY{n}{turbidity\PYZus{}ml\PYZus{}performance}\PY{p}{)}\PY{o}{.}\PY{n}{T}
+
+\PY{c+c1}{\PYZsh{} Rename the first column}
+\PY{n}{turb\PYZus{}model\PYZus{}detection}\PY{o}{.}\PY{n}{columns} \PY{o}{=} \PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{sum of anomalies detected}\PY{l+s+s2}{\PYZdq{}}\PY{p}{]}
+
+\PY{c+c1}{\PYZsh{} Add a new column for anomalies not detected}
+\PY{n}{total\PYZus{}anomalies} \PY{o}{=} \PY{l+m+mi}{216}
+\PY{n}{turb\PYZus{}model\PYZus{}detection}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{anomalies not detected}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{n}{total\PYZus{}anomalies} \PY{o}{\PYZhy{}} \PY{n}{turb\PYZus{}model\PYZus{}detection}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{sum of anomalies detected}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}
+
+\PY{c+c1}{\PYZsh{} Display the DataFrame}
+\PY{n}{turb\PYZus{}model\PYZus{}detection}
+\end{Verbatim}
+\end{tcolorbox}
+
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{20}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+                                sum of anomalies detected  \textbackslash{}
+Turbidity\_isolation\_forest                            182
+Turbidity\_local\_factor\_outlier                          0
+Turbidity\_rrcf                                         19
+
+                                anomalies not detected
+Turbidity\_isolation\_forest                          34
+Turbidity\_local\_factor\_outlier                     216
+Turbidity\_rrcf                                     197
+\end{Verbatim}
+\end{tcolorbox}
+        
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{22}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{ph\PYZus{}ml\PYZus{}performance} \PY{o}{=} \PY{p}{\PYZob{}}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{pH\PYZus{}isolation\PYZus{}forest}\PY{l+s+s2}{\PYZdq{}}\PY{p}{:}\PY{p}{[}\PY{n+nb}{len}\PY{p}{(}\PY{p}{[}\PY{n}{i} \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n}{ph\PYZus{}eval}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{iso\PYZus{}anomalies\PYZus{}pH}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{k}{if}  \PY{n}{i}\PY{o}{==}\PY{k+kc}{True}\PY{p}{]}\PY{p}{)}\PY{p}{]}\PY{p}{,}
+               \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{pH\PYZus{}local\PYZus{}factor\PYZus{}outlier}\PY{l+s+s2}{\PYZdq{}}\PY{p}{:}\PY{p}{[}\PY{n+nb}{len}\PY{p}{(}\PY{p}{[}\PY{n}{i} \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n}{ph\PYZus{}eval}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{lof\PYZus{}anomalies\PYZus{}pH}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{k}{if}  \PY{n}{i}\PY{o}{==}\PY{k+kc}{True}\PY{p}{]}\PY{p}{)}\PY{p}{]}\PY{p}{,}
+               \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{pH\PYZus{}rrcf}\PY{l+s+s2}{\PYZdq{}}\PY{p}{:}\PY{p}{[}\PY{n+nb}{len}\PY{p}{(}\PY{p}{[}\PY{n}{i} \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n}{ph\PYZus{}eval}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{rrcf\PYZus{}anomalies\PYZus{}pH}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{k}{if}  \PY{n}{i}\PY{o}{==}\PY{k+kc}{True}\PY{p}{]}\PY{p}{)}\PY{p}{]}\PY{p}{\PYZcb{}}
+\PY{n}{ph\PYZus{}model\PYZus{}detection} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{DataFrame}\PY{p}{(}\PY{n}{ph\PYZus{}ml\PYZus{}performance}\PY{p}{)}\PY{o}{.}\PY{n}{T}
+\PY{c+c1}{\PYZsh{} Rename the first column}
+\PY{n}{ph\PYZus{}model\PYZus{}detection}\PY{o}{.}\PY{n}{columns} \PY{o}{=} \PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{sum of anomalies detected}\PY{l+s+s2}{\PYZdq{}}\PY{p}{]}
+
+\PY{c+c1}{\PYZsh{} Add a new column for anomalies not detected}
+\PY{n}{total\PYZus{}anomalies} \PY{o}{=} \PY{l+m+mi}{1819}
+\PY{n}{ph\PYZus{}model\PYZus{}detection}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{anomalies not detected}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{n}{total\PYZus{}anomalies} \PY{o}{\PYZhy{}} \PY{n}{ph\PYZus{}model\PYZus{}detection}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{sum of anomalies detected}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}
+\PY{n}{ph\PYZus{}model\PYZus{}detection}
+\end{Verbatim}
+\end{tcolorbox}
+
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{22}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+                         sum of anomalies detected  anomalies not detected
+pH\_isolation\_forest                           1719                     100
+pH\_local\_factor\_outlier                         58                    1761
+pH\_rrcf                                          0                    1819
+\end{Verbatim}
+\end{tcolorbox}
+        
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{1}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{l+m+mi}{1819} \PY{o}{\PYZhy{}} \PY{l+m+mi}{8}
+\end{Verbatim}
+\end{tcolorbox}
+
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{1}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+1811
+\end{Verbatim}
+\end{tcolorbox}
+        
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+
+\end{Verbatim}
+\end{tcolorbox}
+
+
+    % Add a bibliography block to the postdoc
+    
+    
+    
